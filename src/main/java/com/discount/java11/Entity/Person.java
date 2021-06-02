@@ -16,13 +16,15 @@ public class Person {
     private Long id;
     private String firstName;
     private String secondName;
+    private String telephone;
+    private String email;
     private String login;
     private String password;
     private String Role;
 
-    @JoinColumn(name = "oder_id")
+   @JoinColumn(name = "order_id")
     @OneToMany(
-            mappedBy = "oders",
+            mappedBy = "orders",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
