@@ -16,4 +16,9 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Person person;
+
+    public Order() {
+    }
+
+
 }

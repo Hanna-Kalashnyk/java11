@@ -22,7 +22,7 @@ public class Person {
     private String password;
     private String Role;
 
-   @JoinColumn(name = "order_id")
+    @JoinColumn(name = "order_id")
     @OneToMany(
             mappedBy = "orders",
             cascade = CascadeType.ALL,
@@ -30,4 +30,6 @@ public class Person {
     )
     private Set<Order> orders = new HashSet<>();
 
+    public Person() {
+    }
 }
