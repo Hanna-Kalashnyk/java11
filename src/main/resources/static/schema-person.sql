@@ -8,7 +8,7 @@ CREATE TABLE person
     email        VARCHAR(30),
     login        VARCHAR(30) NOT NULL,
     password     VARCHAR(30) NOT NULL,
-    role         VARCHAR(4) NOT NULL
+    role         VARCHAR(10) NOT NULL
 );
 INSERT INTO person
 VALUES (1, 'Jon', 'Herring', '380675553311', 'Herring@gmail.com', 'Herring', 'password', 'user' ),

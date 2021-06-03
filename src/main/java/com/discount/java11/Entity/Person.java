@@ -1,10 +1,9 @@
 package com.discount.java11.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.Generated;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,15 +18,11 @@ public class Person {
     private String telephone;
     private String email;
     private String login;
+    @JsonIgnore
     private String password;
     private String Role;
 
-    @JoinColumn(name = "order_id")
-    @OneToMany(
-            mappedBy = "orders",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "orders")
     private Set<Order> orders = new HashSet<>();
 
     public Person() {
