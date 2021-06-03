@@ -3,6 +3,7 @@ package com.discount.java11.Service;
 
 import com.discount.java11.Entity.Person;
 import com.discount.java11.Repository.PersonRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
 
+    @Autowired
     public PersonServiceImpl(PersonRepository personRepository) {
         this.personRepository = personRepository;
     }

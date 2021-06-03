@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "person")
 @Data
 public class Person {
     @Id
@@ -22,7 +23,8 @@ public class Person {
     private String password;
     private String Role;
 
-    @OneToMany(mappedBy = "orders")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "person_id")
     private Set<Order> orders = new HashSet<>();
 
     public Person() {

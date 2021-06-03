@@ -15,7 +15,7 @@ public class Order {
     private Long id;
     private int price;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Person person;
 
     public Order() {
