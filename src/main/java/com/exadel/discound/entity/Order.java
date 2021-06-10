@@ -1,6 +1,6 @@
-package com.discount.Entity;
+package com.exadel.discound.entity;
 
-import com.discount.Dto.OrderDto;
+import com.exadel.discound.dto.OrderDto;
 import lombok.Data;
 
 import javax.persistence.*;

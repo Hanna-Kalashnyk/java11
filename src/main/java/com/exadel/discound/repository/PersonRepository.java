@@ -1,6 +1,6 @@
-package com.discount.Repository;
+package com.exadel.discound.repository;
 
-import com.discount.Entity.Person;
+import com.exadel.discound.entity.Person;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

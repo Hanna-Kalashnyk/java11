@@ -1,7 +1,6 @@
-package com.discount.Entity;
+package com.exadel.discound.entity;
 
-import com.discount.Dto.PersonDto;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.exadel.discound.dto.PersonDto;
 import lombok.Data;
 
 import javax.persistence.*;
