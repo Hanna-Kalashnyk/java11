@@ -5,7 +5,6 @@ COPY src /build/src
 
 WORKDIR /build/
 RUN mvn clean package
-# нашел на https://hub.docker.com/
 FROM openjdk:11-jre-slim
 
 WORKDIR /app

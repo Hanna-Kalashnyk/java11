@@ -1,1 +1,1 @@
-Main-Class: com.exadel.discound.DiscountApplication
+Main-Class: com.exadel.discount.DiscountApplication
