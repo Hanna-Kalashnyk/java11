@@ -1,5 +1,6 @@
 package com.exadel.discount.service;
 
+import com.exadel.discount.entity.Coupon;
 import com.exadel.discount.entity.User;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface UserService {
 
     User addUser(User user);
 
-    User deleteUser(UUID id);
+    List<User> deleteUser(UUID id);
 
     List<User> findAllUsers();
 
@@ -19,9 +20,9 @@ public interface UserService {
 
     User editUser(UUID id, User user);
 
-    User addCouponToUser(UUID couponId, UUID userId);
+    User addNewCouponToUser(Coupon coupon, UUID userId);
 
-    User removeCouponFromUser(UUID couponId, UUID userId);
+    User removeCouponFromUser(UUID userId, Coupon coupon);
 }
 
 

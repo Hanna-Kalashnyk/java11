@@ -15,7 +15,7 @@ databaseChangeLog:
                   name: user_id
                   type: UUID
                   constraints:
-                    nullable: true
+                    nullable: false
 #              - column:
 #                  name: discount_id
 #                  type: UUID
@@ -25,5 +25,5 @@ databaseChangeLog:
                   name: date
                   type: timestamp
                   constraints:
-                    nullable: true
+                    nullable: false
 

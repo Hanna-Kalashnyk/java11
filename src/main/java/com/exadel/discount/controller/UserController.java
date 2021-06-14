@@ -1,6 +1,9 @@
 package com.exadel.discount.controller;
 
-import com.exadel.discount.dto.UserDto;
+import com.exadel.discount.dto.coupon.CouponDto;
+import com.exadel.discount.dto.user.BaseUserDto;
+import com.exadel.discount.dto.user.UserDto;
+import com.exadel.discount.entity.Coupon;
 import com.exadel.discount.entity.User;
 import com.exadel.discount.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +27,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> addUser(@RequestBody final UserDto userDto) {
-        User user = userService.addUser(User.from(userDto));
+    public ResponseEntity<UserDto> addUser(@RequestBody final BaseUserDto baseUserDto) {
+        User user = userService.addUser(User.from(baseUserDto));
         return new ResponseEntity<>(UserDto.from(user), HttpStatus.OK);
     }
 
@@ -43,14 +46,15 @@ public class UserController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<UserDto> deleteUser(@PathVariable final UUID id) {
-        User user = userService.deleteUser(id);
-        return new ResponseEntity<>(UserDto.from(user), HttpStatus.OK);
+    public ResponseEntity<List<UserDto>> deleteUser(@PathVariable final UUID id) {
+        List<User> remaindedUsers = userService.deleteUser(id);
+        List<UserDto> remaindedUsersDto = remaindedUsers.stream().map(UserDto::from).collect(Collectors.toList());
+        return new ResponseEntity<>(remaindedUsersDto, HttpStatus.OK);
     }
 
     @PutMapping("{id}")
     public ResponseEntity<UserDto> editUser(@PathVariable final UUID id,
-                                                @RequestBody final UserDto userDto) {
+                                            @RequestBody final UserDto userDto) {
         User user = userService.editUser(id, User.from(userDto));
         return new ResponseEntity<>(UserDto.from(user), HttpStatus.OK);
     }
@@ -62,17 +66,17 @@ public class UserController {
         return new ResponseEntity<>(usersDto, HttpStatus.OK);
     }
 
-    @PostMapping("{personId}/order/{couponId}/add")
-    public ResponseEntity<UserDto> addCouponToUser(@PathVariable final UUID userId,
-                                                       @PathVariable final UUID couponId) {
-        User user = userService.addCouponToUser(userId, couponId);
+    @PostMapping("userid/{userId}")
+    public ResponseEntity<UserDto> addCouponToUser(@RequestBody final CouponDto couponDto,
+                                                   @PathVariable final UUID userId) {
+        User user = userService.addNewCouponToUser(Coupon.from(couponDto), userId);
         return new ResponseEntity<>(UserDto.from(user), HttpStatus.OK);
     }
 
-    @DeleteMapping("{userId}/coupon/{couponId}/remove")
+    @DeleteMapping("{userId}/couponout")
     public ResponseEntity<UserDto> removeCouponFromUser(@PathVariable final UUID userId,
-                                                            @PathVariable final UUID couponId) {
-        User user = userService.removeCouponFromUser(userId, couponId);
+                                                        @RequestBody final Coupon coupon) {
+        User user = userService.removeCouponFromUser(userId, coupon);
         return new ResponseEntity<>(UserDto.from(user), HttpStatus.OK);
     }
 }
