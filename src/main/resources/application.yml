@@ -21,6 +21,12 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
+    spring:
+      mvc:
+        format:
+          date-time: iso
+
+        locale: en_GB
 # Logger configuration
 logging:
   pattern:

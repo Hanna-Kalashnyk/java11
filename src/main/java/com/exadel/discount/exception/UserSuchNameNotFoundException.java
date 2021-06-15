@@ -7,7 +7,7 @@ import java.text.MessageFormat;
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class UserSuchNameNotFoundException extends RuntimeException{
-    public UserSuchNameNotFoundException(String name) {
-        MessageFormat.format("Could not found person with name:{0}", name);
+    public UserSuchNameNotFoundException(String lastname, String firstname) {
+        MessageFormat.format("Could not found person with name:{0} {1}", lastname, firstname);
     }
 }

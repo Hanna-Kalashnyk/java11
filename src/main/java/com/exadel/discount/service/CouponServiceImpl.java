@@ -9,9 +9,8 @@ import com.exadel.discount.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,29 +29,12 @@ public class CouponServiceImpl implements CouponService {
 
     @Transactional
     @Override
-    public Coupon addCoupon( UUID userId, Coupon coupon) {
+    public Coupon addCouponToUser(UUID userId, Coupon coupon) {
         User user = userRepository.findUserById(userId);
+        user.addCoupon(coupon);
         coupon.setUser(user);
         couponRepository.save(coupon);
         return coupon;
-    }
-
-    @Transactional
-    @Override
-    public Coupon switchCouponToAnotherUser(UUID couponId, UUID anotherUserId) {
-        User user = userRepository.findUserById(anotherUserId);
-        Coupon coupon = couponRepository.findCouponById(couponId);
-        user.addCoupon(coupon);
-        coupon.setUser(user);
-        return coupon;
-    }
-
-    @Transactional
-    @Override
-    public List<Coupon> deleteCoupon(UUID id) {
-        Coupon cuopon = couponRepository.findCouponById(id);
-        couponRepository.delete(cuopon);
-        return findAllCoupons();
     }
 
     @Override
@@ -70,7 +52,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public Coupon findCouponByDate(Timestamp date) {
+    public Coupon findCouponByDate(LocalDateTime date) {
         Coupon coupon = couponRepository.findCouponByDate(date);
         if (coupon == null) throw new CouponNotFoundAtSuchDateException(date);
         return coupon;
@@ -78,10 +60,24 @@ public class CouponServiceImpl implements CouponService {
 
     @Transactional
     @Override
-    public Coupon editCoupon(UUID id, Coupon coupon) {
+    public Coupon editCouponDate(UUID id, Coupon newDateCoupon) {
         Coupon couponUnderEdition = findCouponById(id);
-        couponUnderEdition.setDate(coupon.getDate());
-        return coupon;
+        couponUnderEdition.setDate(newDateCoupon.getDate());
+        return couponUnderEdition;
     }
 
+    @Transactional
+    @Override
+    public List<Coupon> deleteCoupon(UUID id) {
+        Coupon coupon = findCouponById(id);
+        coupon.getUser().removeCoupon(coupon);
+        couponRepository.delete(coupon);
+        return findAllCoupons();
+    }
+
+    @Override
+    public List<Coupon> getCouponsOfUser(UUID userId) {
+        return userRepository.findUserById(userId).getCoupons();
+
+    }
 }

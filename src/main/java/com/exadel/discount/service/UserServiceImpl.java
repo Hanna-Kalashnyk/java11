@@ -1,8 +1,6 @@
 package com.exadel.discount.service;
 
-import com.exadel.discount.entity.Coupon;
 import com.exadel.discount.entity.User;
-import com.exadel.discount.exception.CouponNotFoundException;
 import com.exadel.discount.exception.UserNotFoundException;
 import com.exadel.discount.exception.UserSuchNameNotFoundException;
 import com.exadel.discount.repository.CouponRepository;
@@ -34,17 +32,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    @Transactional
-    @Override
-    public List<User> deleteUser(UUID id) {
-        User deletedUser = findUserById(id);
-        userRepository.delete(deletedUser);
-        return findAllUsers();
-    }
 
     @Override
     public User findUserById(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Override
@@ -55,9 +47,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findUsersByName(String name) {
-        List<User> suchNameUserList = userRepository.findUsersByName(name);
-        if (suchNameUserList.size() == 0) throw new UserSuchNameNotFoundException(name);
+    public List<User> findUsersByName(String lastName, String firstName) {
+        List<User> suchNameUserList = userRepository.findDistinctByLastNameAndFirstName(lastName, firstName);
+        if (suchNameUserList.size() == 0) throw new UserSuchNameNotFoundException(lastName, firstName);
         return suchNameUserList;
     }
 
@@ -77,21 +69,11 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public User addNewCouponToUser(Coupon coupon, UUID userId) {
-        User user = findUserById(userId);
-        coupon.setUser(user);
-        couponRepository.save(coupon);
-        user.addCoupon(coupon);
-        coupon.setUser(user);
-        return user;
+    public List<User> deleteUser(UUID id) {
+        User deletedUser = findUserById(id);
+        userRepository.delete(deletedUser);
+        return findAllUsers();
     }
 
-    @Transactional
-    @Override
-    public User removeCouponFromUser(UUID userId, Coupon coupon) {
-        couponRepository.delete(coupon);
-        findUserById(userId).removeCoupon(coupon);
-        return findUserById(userId);
-    }
 }
 

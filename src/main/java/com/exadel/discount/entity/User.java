@@ -4,6 +4,7 @@ import com.exadel.discount.config.EnumPostgresSQLType;
 import com.exadel.discount.dto.user.BaseUserDto;
 import com.exadel.discount.dto.user.UserDto;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 @Data
+@NoArgsConstructor
 @TypeDef(
         name = "user_role",
         typeClass = EnumPostgresSQLType.class
@@ -40,13 +42,11 @@ public class User implements Serializable {
     @Type(type = "user_role")
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JoinColumn(name = "user_id")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Coupon> coupons = new ArrayList<>();
 
-    public User() {
-    }
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Favorite> favorites = new ArrayList<>();
 
     public void addCoupon(Coupon coupon) {
         coupons.add(coupon);
@@ -54,6 +54,13 @@ public class User implements Serializable {
 
     public void removeCoupon(Coupon coupon) {
         coupons.remove(coupon);
+    }
+    public void addFavorite(Favorite favorite) {
+        favorites.add(favorite);
+    }
+
+    public void removeFavorite(Favorite favorite) {
+        favorites.remove(favorite);
     }
 
     public static User from(UserDto userDto) {
@@ -78,14 +85,5 @@ public class User implements Serializable {
         user.setPassword(baseUserDto.getPassword());
         user.setRole(baseUserDto.getRole());
         return user;
-    }
-    public User(String firstName, String lastName, String phone, String email, String login, String password, Role role) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phone = phone;
-        this.email = email;
-        this.login = login;
-        this.password = password;
-        this.role = role;
     }
 }

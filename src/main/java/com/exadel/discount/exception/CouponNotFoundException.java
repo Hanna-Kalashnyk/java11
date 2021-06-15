@@ -9,6 +9,6 @@ import java.util.UUID;
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class CouponNotFoundException extends RuntimeException {
     public CouponNotFoundException(UUID id) {
-        super(MessageFormat.format("Could not find Coupon with id:{0}", id));
+        super(MessageFormat.format("Could not find coupon with id:{0}", id));
     }
 }

@@ -2,7 +2,7 @@ package com.exadel.discount.service;
 
 import com.exadel.discount.entity.Coupon;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,12 +14,11 @@ public interface CouponService {
 
     List<Coupon> findAllCoupons();
 
-    Coupon addCoupon( UUID userId, Coupon coupon);
+    Coupon addCouponToUser(UUID userId, Coupon coupon);
 
-    Coupon findCouponByDate(Timestamp time);
+    Coupon findCouponByDate(LocalDateTime time);
 
-    Coupon switchCouponToAnotherUser(UUID couponId, UUID anotherUserId);
+    Coupon editCouponDate(UUID couponId, Coupon newDateCoupon);
 
-    Coupon editCoupon(UUID id, Coupon coupon);
-
+    List<Coupon> getCouponsOfUser(UUID userId);
 }
