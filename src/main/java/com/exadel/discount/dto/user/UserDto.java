@@ -12,7 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Data
-public class UserDto {
+public class UserDto extends BaseUserDto {
     private UUID id;
     private String firstName;
     private String lastName;
