@@ -4,6 +4,7 @@ import com.exadel.discount.dto.coupon.CouponDto;
 import com.exadel.discount.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public class CouponController {
     private final CouponService couponService;
 
     @PostMapping("{userId}")
-    public CouponDto addCoupon(@PathVariable final UUID userId,
+    public CouponDto addCoupon(@Validated(com.exadel.discount.dto.validation.Create.class)@PathVariable final UUID userId,
                                @RequestBody CouponDto couponDto) {
         return couponService.addCouponToUser(userId, couponDto);
     }

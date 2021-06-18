@@ -1,85 +1,70 @@
-//package com.exadel.discount.service;
-//
-//import com.exadel.discount.dto.user.UserDto;
-//import com.exadel.discount.entity.User;
-//import com.exadel.discount.exception.UserNotFoundException;
-//import com.exadel.discount.exception.UserSuchNameNotFoundException;
-//import com.exadel.discount.mapper.UserMapper;
-//import com.exadel.discount.repository.CouponRepository;
-//import com.exadel.discount.repository.UserRepository;
-//import liquibase.pro.packaged.U;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.util.List;
-//import java.util.UUID;
-//import java.util.stream.Collectors;
-//import java.util.stream.StreamSupport;
-//
-//@Service
-//public class UserServiceImpl implements UserMapper {
-//
-//    private final UserRepository userRepository;
-//    private final CouponRepository couponRepository;
-//    private final UserMapper userMapper;
-//
-//    @Autowired
-//    public UserServiceImpl(UserRepository userRepository, CouponRepository couponRepository) {
-//        this.userRepository = userRepository;
-//        this.couponRepository = couponRepository;
-//    }
-//
-//    @Transactional
-//    @Override
-//    public UserDto addUser(BaseUserDto baseUserDto) {
-//        User user = baseUserMapper.toUser(userDto);
-//        userRepository.save(user);
-//        return userMapper.toUserDto(user);
-//    }
-//
-//
-//    @Override
-//    public User findUserById(UUID id) {
-//        return userRepository.findById(id)
-//                .orElseThrow(() -> new UserNotFoundException(id));
-//    }
-//
-//    @Override
-//    public List<User> findAllUsers() {
-//        return StreamSupport.
-//                stream(userRepository.findAll().spliterator(), false)
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public List<User> findUsersByName(String lastName, String firstName) {
-//        List<User> suchNameUserList = userRepository.findDistinctByLastNameAndFirstName(lastName, firstName);
-//        if (suchNameUserList.size() == 0) throw new UserSuchNameNotFoundException(lastName, firstName);
-//        return suchNameUserList;
-//    }
-//
-//    @Transactional
-//    @Override
-//    public User editUser(UUID id, User user) {
-//        User editedUser = findUserById(id);
-//        editedUser.setFirstName(user.getFirstName());
-//        editedUser.setLastName(user.getLastName());
-//        editedUser.setEmail(user.getEmail());
-//        editedUser.setPhone(user.getPhone());
-//        editedUser.setRole(user.getRole());
-//        editedUser.setLogin(user.getLogin());
-//        editedUser.setPassword(user.getPassword());
-//        return editedUser;
-//    }
-//
-//    @Transactional
-//    @Override
-//    public List<User> deleteUser(UUID id) {
-//        User deletedUser = findUserById(id);
-//        userRepository.delete(deletedUser);
-//        return findAllUsers();
-//    }
-//
-//}
-//
+package com.exadel.discount.service;
+
+import com.exadel.discount.dto.user.UserDto;
+import com.exadel.discount.entity.User;
+import com.exadel.discount.exception.UserNotFoundException;
+import com.exadel.discount.exception.UserSuchNameNotFoundException;
+import com.exadel.discount.mapper.UserMapper;
+import com.exadel.discount.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@AllArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
+    @Transactional
+    @Override
+    public UserDto addUser(UserDto UserDto) {
+        User user = userMapper.toUser(UserDto);
+        userRepository.save(user);
+        return userMapper.toUserDto(user);
+    }
+
+    @Override
+    public UserDto findUserById(UUID id) {
+        return userRepository.findById(id)
+                .map(userMapper::toUserDto)
+                .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    @Override
+    public List<UserDto> findAllUsers() {
+        List<User> userList = userRepository.findAll();
+        return userMapper.toUserDtoList(userList);
+    }
+
+    @Override
+    public List<UserDto> findUsersByName(String lastName, String firstName) {
+        List<User> suchNameUserList = userRepository.findDistinctByLastNameAndFirstName(lastName, firstName);
+        if (suchNameUserList.size() == 0) throw new UserSuchNameNotFoundException(lastName, firstName);
+        return userMapper.toUserDtoList(suchNameUserList);
+    }
+
+    @Transactional
+    @Override
+    public UserDto editUser(UUID id, UserDto userDto) {
+        UserDto editedUser = findUserById(id);
+        editedUser.setFirstName(userDto.getFirstName());
+        editedUser.setLastName(userDto.getLastName());
+        editedUser.setEmail(userDto.getEmail());
+        editedUser.setPhone(userDto.getPhone());
+        editedUser.setRole(userDto.getRole());
+        editedUser.setLogin(userDto.getLogin());
+        editedUser.setPassword(userDto.getPassword());
+        return editedUser;
+    }
+
+    @Transactional
+    @Override
+    public void deleteUser(UUID id) {
+        userRepository.deleteById(id);
+    }
+}

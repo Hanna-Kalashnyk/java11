@@ -5,6 +5,7 @@ import com.exadel.discount.entity.Coupon;
 import com.exadel.discount.entity.User;
 import com.exadel.discount.exception.CouponNotFoundAtSuchDateException;
 import com.exadel.discount.exception.CouponNotFoundException;
+import com.exadel.discount.exception.UserNotFoundException;
 import com.exadel.discount.mapper.CouponMapper;
 import com.exadel.discount.repository.CouponRepository;
 import com.exadel.discount.repository.UserRepository;
@@ -26,7 +27,7 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     @Override
     public CouponDto addCouponToUser(UUID userId, CouponDto couponDto) {
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId));
         Coupon coupon = couponMapper.toCoupon(couponDto);
         user.addCoupon(coupon);
         coupon.setUser(user);
@@ -53,6 +54,7 @@ public class CouponServiceImpl implements CouponService {
         if (couponRepository.findCouponByDate(date) == null) throw new CouponNotFoundAtSuchDateException(date);
         Coupon coupon = couponRepository.findCouponByDate(date);
         if (coupon == null) throw new CouponNotFoundAtSuchDateException(date);
+        coupon.setUser(null);
         return couponMapper.toCouponDto(coupon);
     }
 
@@ -74,8 +76,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public List<CouponDto> getCouponsOfUser(UUID userId) {
-        List<Coupon> coupons = userRepository.findUserById(userId).getCoupons();
+        List<Coupon> coupons = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId)).getCoupons();
         return couponMapper.toCouponDtoList(coupons);
-
     }
 }

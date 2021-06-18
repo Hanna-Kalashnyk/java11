@@ -4,6 +4,7 @@ import com.exadel.discount.dto.favorite.FavoriteDto;
 import com.exadel.discount.entity.Favorite;
 import com.exadel.discount.entity.User;
 import com.exadel.discount.exception.FavoriteNotFoundException;
+import com.exadel.discount.exception.UserNotFoundException;
 import com.exadel.discount.mapper.FavoriteMapper;
 import com.exadel.discount.repository.FavoriteRepository;
 import com.exadel.discount.repository.UserRepository;
@@ -24,7 +25,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Transactional
     @Override
     public FavoriteDto addFavoriteToUser(UUID userId, FavoriteDto favoriteDto) {
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId));
         Favorite favorite = favoriteMapper.toFavorite(favoriteDto);
         user.addFavorite(favoriteMapper.toFavorite(favoriteDto));
         favorite.setUser(user);
@@ -54,7 +55,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public List<FavoriteDto> getFavoritesOfUser(UUID userId) {
-        List<Favorite> favoriteList = userRepository.findUserById(userId).getFavorites();
+        List<Favorite> favoriteList = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId)).getFavorites();
         return favoriteMapper.toFavoriteDtoList(favoriteList);
     }
 }
