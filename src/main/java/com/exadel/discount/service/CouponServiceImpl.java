@@ -71,9 +71,11 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     @Override
     public void deleteCoupon(UUID id) {
+        Coupon coupon = couponRepository.findById(id)
+                .orElseThrow(() -> new CouponNotFoundException(id));
+        coupon.getUser().removeCoupon(coupon);
         couponRepository.deleteById(id);
     }
-
     @Override
     public List<CouponDto> getCouponsOfUser(UUID userId) {
         List<Coupon> coupons = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId)).getCoupons();

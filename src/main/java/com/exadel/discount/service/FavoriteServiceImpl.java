@@ -1,8 +1,10 @@
 package com.exadel.discount.service;
 
 import com.exadel.discount.dto.favorite.FavoriteDto;
+import com.exadel.discount.entity.Coupon;
 import com.exadel.discount.entity.Favorite;
 import com.exadel.discount.entity.User;
+import com.exadel.discount.exception.CouponNotFoundException;
 import com.exadel.discount.exception.FavoriteNotFoundException;
 import com.exadel.discount.exception.UserNotFoundException;
 import com.exadel.discount.mapper.FavoriteMapper;
@@ -50,6 +52,9 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Transactional
     @Override
     public void deleteFavorite(UUID id) {
+        Favorite favorite = favoriteRepository.findById(id)
+                .orElseThrow(() -> new FavoriteNotFoundException(id));
+        favorite.getUser().removeFavorite(favorite);
         favoriteRepository.deleteById(id);
     }
 

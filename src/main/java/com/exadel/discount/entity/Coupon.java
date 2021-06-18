@@ -12,9 +12,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "coupons")
-
 public class Coupon {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;

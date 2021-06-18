@@ -55,12 +55,18 @@ public class User implements Serializable {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Favorite> favorites = new ArrayList<>();
-
     public void addCoupon(Coupon coupon) {
         coupons.add(coupon);
     }
 
+    public void removeCoupon(Coupon coupon) {
+        coupons.remove(coupon);
+    }
     public void addFavorite(Favorite favorite) {
         favorites.add(favorite);
+    }
+
+    public void removeFavorite(Favorite favorite) {
+        favorites.remove(favorite);
     }
 }
