@@ -3,13 +3,24 @@ package com.exadel.discount.entity;
 import com.exadel.discount.config.EnumPostgresSQLType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,12 +29,14 @@ import java.util.UUID;
 @Table(name = "users")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(exclude = {"coupons","favorites"})
+@ToString(exclude = {"coupons","favorites"})
 @TypeDef(
         name = "user_role",
         typeClass = EnumPostgresSQLType.class
 )
-public class User implements Serializable {
-
+public class User {
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")
@@ -55,18 +68,8 @@ public class User implements Serializable {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Favorite> favorites = new ArrayList<>();
-    public void addCoupon(Coupon coupon) {
-        coupons.add(coupon);
-    }
 
-    public void removeCoupon(Coupon coupon) {
-        coupons.remove(coupon);
-    }
-    public void addFavorite(Favorite favorite) {
-        favorites.add(favorite);
-    }
-
-    public void removeFavorite(Favorite favorite) {
-        favorites.remove(favorite);
-    }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="city_id", nullable=false)
+    private City city;
 }

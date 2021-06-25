@@ -9,11 +9,7 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
+    <Optional> User findByEmail(String email);
     List<User> findDistinctByLastNameAndFirstName(String lastName, String firstName);
 
-    void deleteById(UUID id);
-
-    default User findUserById(UUID userId) {
-        return findById(userId).get();
-    }
 }
