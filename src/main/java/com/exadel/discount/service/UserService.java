@@ -10,9 +10,10 @@ import java.util.UUID;
 public interface UserService {
     UserCityDto findUserById(UUID id);
 
-    List<UserDto> findAllUsers();
+    List<UserCityDto> findAllUsers(int pageNumber, int pageSize, String sortDirection, String sortField);
+    List<UserCityDto> findUsersByRole(int pageNumber, int pageSize, String sortDirection, String sortField, String roleFilter);
+    List<UserCityDto> findUsersOfCity(int pageNumber, int pageSize, String sortDirection, String sortField, String cityFilter);
+    List<UserCityDto> findUsersOfCountry(int pageNumber, int pageSize, String sortDirection, String sortField, String countryFilter);
 
     List<UserDto> findUsersByName(String lastName, String firstName);
 }
-
-

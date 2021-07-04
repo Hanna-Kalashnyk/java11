@@ -6,10 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -30,8 +33,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"coupons","favorites"})
-@ToString(exclude = {"coupons","favorites"})
+@EqualsAndHashCode(exclude = {"coupons", "favorites"})
+@ToString(exclude = {"coupons", "favorites"})
 @TypeDef(
         name = "user_role",
         typeClass = EnumPostgresSQLType.class
@@ -58,18 +61,20 @@ public class User {
     @Column(name = "password", length = 225, nullable = false)
     private String password;
 
+    @Fetch(FetchMode.JOIN)
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "role")
+    @Column(columnDefinition = "role", nullable = false)
     @Type(type = "user_role")
     private Role role;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Coupon> coupons = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorites = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.JOIN)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="city_id", nullable=false)
     private City city;
 }

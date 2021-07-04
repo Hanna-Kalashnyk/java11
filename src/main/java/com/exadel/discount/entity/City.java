@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -21,8 +23,8 @@ import java.util.UUID;
 @Table(name = "cities")
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"users", "vendorLocations"})
-@ToString(exclude = {"users", "vendorLocations"})
+@EqualsAndHashCode(exclude = {"users"})
+@ToString(exclude = {"users"})
 public class City {
     @Id
     @Column(name = "id")
@@ -36,6 +38,7 @@ public class City {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
+    @Fetch(FetchMode.JOIN)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="country_id", nullable=false)
     private Country country;
@@ -43,6 +46,6 @@ public class City {
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
     private List<User> users;
 
-    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
-    private List<VendorLocation> vendorLocations;
+//    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
+//    private List<VendorLocation> vendorLocations;
 }
