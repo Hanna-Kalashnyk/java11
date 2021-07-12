@@ -44,8 +44,6 @@ public class CouponController {
                                          @RequestParam(required = false) List<UUID> countryId,
                                          @RequestParam(required = false) List<UUID> cityId,
                                          @RequestParam(required = false) List<UUID> tagId,
-                                         @RequestParam(required = false) Integer percentFrom,
-                                         @RequestParam(required = false) Integer percentTo,
                                          @RequestParam(required = false)
                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                                                      LocalDateTime endDateTimeFrom,
@@ -65,8 +63,6 @@ public class CouponController {
                 .countryIds(countryId)
                 .cityIds(cityId)
                 .tagIds(tagId)
-                .percentFrom(percentFrom)
-                .percentTo(percentTo)
                 .userId(userId)
                 .endDateFrom(endDateTimeFrom)
                 .endDateTo(endDateTimeTo)

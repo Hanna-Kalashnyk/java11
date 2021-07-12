@@ -4,7 +4,7 @@ import com.exadel.discount.dto.user.UserDTO;
 import com.exadel.discount.dto.user.UserFilter;
 import com.exadel.discount.entity.QUser;
 import com.exadel.discount.entity.User;
-import com.exadel.discount.exception.NotFoundException;
+import com.exadel.discount.exception.custom_exception.NotFoundException;
 import com.exadel.discount.mapper.UserMapper;
 import com.exadel.discount.repository.UserRepository;
 import com.exadel.discount.repository.query.QueryPredicateBuilder;
@@ -72,9 +72,9 @@ public class UserServiceImpl implements UserService {
                 QueryPredicateBuilder.init()
                         .append(userFilter.getCityName(), QUser.user.city.name::eq)
                         .append(userFilter.getCountryName(), QUser.user.city.country.name::eq)
-                        .append(userFilter.getRole(), QUser.user.role::eq)
                         .buildOr(),
                 QueryPredicateBuilder.init()
+                        .append(userFilter.getRole(), QUser.user.role::eq)
                         .append(userFilter.getFirstName(), QUser.user.firstName::containsIgnoreCase)
                         .append(userFilter.getLastName(), QUser.user.lastName::containsIgnoreCase)
                         .buildAnd());

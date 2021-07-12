@@ -1,6 +1,5 @@
 package com.exadel.discount.controller;
 
-import com.exadel.discount.dto.discount.DiscountFilter;
 import com.exadel.discount.dto.user.UserDTO;
 import com.exadel.discount.dto.user.UserFilter;
 import com.exadel.discount.entity.Role;
@@ -33,7 +32,7 @@ public class UserController {
                                      @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
                                      @RequestParam(name = "sortDirection", defaultValue = "") String sortDirection,
                                      @RequestParam(name = "sortField", defaultValue = "id") String sortBy,
-                                     @RequestParam(name = "role", defaultValue = "", required = false) String role,
+                                     @RequestParam(name = "role", defaultValue = "USER", required = false) String role,
                                      @RequestParam(name = "cityName", required = false) String cityName,
                                      @RequestParam(name = "countryName", required = false) String countryName,
                                      @RequestParam(name = "firstName", required = false) String firstName,

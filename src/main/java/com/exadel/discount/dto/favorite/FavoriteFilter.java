@@ -18,7 +18,5 @@ public class FavoriteFilter {
     private List<UUID> tagIds;
     private LocalDateTime endDateFrom;
     private LocalDateTime endDateTo;
-    private Integer percentFrom;
-    private Integer percentTo;
     private Boolean archived;
 }

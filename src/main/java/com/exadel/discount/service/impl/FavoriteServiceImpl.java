@@ -7,7 +7,7 @@ import com.exadel.discount.entity.Discount;
 import com.exadel.discount.entity.Favorite;
 import com.exadel.discount.entity.QFavorite;
 import com.exadel.discount.entity.User;
-import com.exadel.discount.exception.NotFoundException;
+import com.exadel.discount.exception.custom_exception.NotFoundException;
 import com.exadel.discount.mapper.FavoriteMapper;
 import com.exadel.discount.repository.DiscountRepository;
 import com.exadel.discount.repository.FavoriteRepository;
@@ -112,8 +112,6 @@ public class FavoriteServiceImpl implements FavoriteService {
                 QueryPredicateBuilder.init()
                         .append(favoritefilter.getUserId(), QFavorite.favorite.user.id::eq)
                         .append(favoritefilter.getArchived(), QFavorite.favorite.discount.archived::eq)
-                        .append(favoritefilter.getPercentFrom(), QFavorite.favorite.discount.percent::goe)
-                        .append(favoritefilter.getPercentTo(), QFavorite.favorite.discount.percent::loe)
                         .append(favoritefilter.getEndDateFrom(), QFavorite.favorite.discount.endTime::goe)
                         .append(favoritefilter.getEndDateTo(), QFavorite.favorite.discount.endTime::loe)
                         .append(favoritefilter.getCategoryIds(), QFavorite.favorite.discount.category.id::in)

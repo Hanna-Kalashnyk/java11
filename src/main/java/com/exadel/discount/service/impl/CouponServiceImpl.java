@@ -7,7 +7,7 @@ import com.exadel.discount.entity.Coupon;
 import com.exadel.discount.entity.Discount;
 import com.exadel.discount.entity.QCoupon;
 import com.exadel.discount.entity.User;
-import com.exadel.discount.exception.NotFoundException;
+import com.exadel.discount.exception.custom_exception.NotFoundException;
 import com.exadel.discount.mapper.CouponMapper;
 import com.exadel.discount.repository.CouponRepository;
 import com.exadel.discount.repository.DiscountRepository;
@@ -113,8 +113,6 @@ public class CouponServiceImpl implements CouponService {
                         .append(couponfilter.getStartDate(), QCoupon.coupon.date::goe)
                         .append(couponfilter.getEndDate(), QCoupon.coupon.date::loe)
                         .append(couponfilter.getArchived(), QCoupon.coupon.discount.archived::eq)
-                        .append(couponfilter.getPercentFrom(), QCoupon.coupon.discount.percent::goe)
-                        .append(couponfilter.getPercentTo(), QCoupon.coupon.discount.percent::loe)
                         .append(couponfilter.getEndDateFrom(), QCoupon.coupon.discount.endTime::goe)
                         .append(couponfilter.getEndDateTo(), QCoupon.coupon.discount.endTime::loe)
                         .append(couponfilter.getCategoryIds(), QCoupon.coupon.discount.category.id::in)
