@@ -10,9 +10,9 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCouponDto {
-    @NotNull
+public class CreateCouponDTO {
+    @NotNull(message = "Coupon ID should be not null")
     private UUID userId;
-    @NotNull
+    @NotNull(message = "Discount ID should be not null")
     private UUID discountId;
 }

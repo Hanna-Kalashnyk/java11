@@ -1,21 +1,28 @@
 package com.exadel.discount.entity;
 
+import com.exadel.discount.entity.type.EnumPostgresSQLType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
+import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Column;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
+import javax.persistence.JoinTable;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -26,6 +33,10 @@ import java.util.UUID;
 @Table(name = "discounts")
 @EqualsAndHashCode(exclude = {"tags", "vendorLocations"})
 @ToString(exclude = {"tags", "vendorLocations"})
+@TypeDef(
+        name = "discount_type",
+        typeClass = EnumPostgresSQLType.class
+)
 public class Discount {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -35,9 +46,9 @@ public class Discount {
     @Column(name = "id")
     private UUID id;
 
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "category_id")
-//    private Category category;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Column(name = "name", length = 50, nullable = false)
     private String name;
@@ -48,8 +59,13 @@ public class Discount {
     @Column(name = "promo", length = 50, nullable = false)
     private String promo;
 
-    @Column(name = "percent")
-    private Integer percent;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "discountType", nullable = false)
+    @Type(type = "discount_type")
+    private DiscountType discountType;
+
+    @Column(name = "value")
+    private BigDecimal value;
 
     @Column(name = "start_time")
     private LocalDateTime startTime;
@@ -66,13 +82,13 @@ public class Discount {
     @Column(name = "view_number", columnDefinition = "integer default 0")
     private Integer viewNumber = 0;
 
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "discounts_locations",
-//            joinColumns = @JoinColumn(name = "discount_id"),
-//            inverseJoinColumns = @JoinColumn(name = "location_id")
-//    )
-//    private Set<VendorLocation> vendorLocations;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "discounts_locations",
+            joinColumns = @JoinColumn(name = "discount_id"),
+            inverseJoinColumns = @JoinColumn(name = "location_id")
+    )
+    private Set<VendorLocation> vendorLocations;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -82,7 +98,7 @@ public class Discount {
     )
     private Set<Tag> tags;
 
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "vendor_id")
-//    private Vendor vendor;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "vendor_id")
+    private Vendor vendor;
 }

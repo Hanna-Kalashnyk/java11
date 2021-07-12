@@ -19,33 +19,27 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 import java.util.UUID;
-@Entity
-@Table(name = "cities")
+
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"users"})
-@ToString(exclude = {"users"})
+@Entity
+@EqualsAndHashCode(exclude = {"vendorLocations"})
+@ToString(exclude = {"vendorLocations"})
+@Table(name = "cities")
 public class City {
     @Id
-    @Column(name = "id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
-    @Fetch(FetchMode.JOIN)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="country_id", nullable=false)
+    @JoinColumn(name = "country_id", nullable = false)
     private Country country;
 
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
-    private List<User> users;
-
-//    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
-//    private List<VendorLocation> vendorLocations;
+    private List<VendorLocation> vendorLocations;
 }

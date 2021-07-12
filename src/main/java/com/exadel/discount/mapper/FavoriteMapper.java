@@ -1,15 +1,15 @@
 package com.exadel.discount.mapper;
 
-import com.exadel.discount.dto.favorite.FavoriteDto;
+import com.exadel.discount.dto.favorite.FavoriteDTO;
 import com.exadel.discount.entity.Favorite;
 import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {DiscountMapper.class})
 public interface FavoriteMapper {
 
-    FavoriteDto toFavoriteDto(Favorite favorite);
+    FavoriteDTO toFavoriteDTO (Favorite favorite);
 
-    List<FavoriteDto> toFavoriteDtoList(List<Favorite> favorites);
+    List<FavoriteDTO> toFavoriteDTOList (List<Favorite> favorites);
 }
