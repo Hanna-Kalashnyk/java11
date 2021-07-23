@@ -1,6 +1,6 @@
 package com.exadel.discount.repository;
 
-import com.exadel.discount.entity.Vendor;
+import com.exadel.discount.model.entity.Vendor;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,16 +15,16 @@ import java.util.UUID;
 @Repository
 public interface VendorRepository extends JpaRepository<Vendor, UUID> {
 
-    @EntityGraph(attributePaths = {"vendorLocations", "vendorLocations.city", "vendorLocations.city.country"})
     List<Vendor> findAll();
 
-    @EntityGraph(attributePaths = {"vendorLocations", "vendorLocations.city", "vendorLocations.city.country"})
+    @EntityGraph(attributePaths = {"vendorLocations", "vendorLocations.city", "vendorLocations.city.country",
+            "discounts", "discounts.category", "discounts.tags"})
     Optional<Vendor> findById(UUID id);
 
-    @EntityGraph(attributePaths = {"vendorLocations", "vendorLocations.city", "vendorLocations.city.country"})
     List<Vendor> findAllByArchived(boolean archived);
 
-    @EntityGraph(attributePaths = {"vendorLocations", "vendorLocations.city", "vendorLocations.city.country"})
+    @EntityGraph(attributePaths = {"vendorLocations", "vendorLocations.city", "vendorLocations.city.country",
+            "discounts", "discounts.category", "discounts.tags"})
     Optional<Vendor> findByIdAndArchived(UUID id, boolean archived);
 
     @Modifying
@@ -36,4 +36,7 @@ public interface VendorRepository extends JpaRepository<Vendor, UUID> {
     boolean existsByIdWithNoDiscounts(@Param("vendorId") UUID vendorId);
 
     boolean existsByIdAndArchived(UUID id, boolean archived);
+
+    @EntityGraph(attributePaths = {"vendorLocations", "vendorLocations.city", "vendorLocations.city.country"})
+    Vendor save(Vendor vendor);
 }

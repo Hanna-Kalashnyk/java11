@@ -1,6 +1,6 @@
 package com.exadel.discount.repository;
 
-import com.exadel.discount.entity.User;
+import com.exadel.discount.model.entity.User;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,8 +21,8 @@ public interface UserRepository extends JpaRepository<User, UUID>, QuerydslPredi
     Page<User> findAll(Predicate predicate, Pageable paging);
 
     @EntityGraph(attributePaths = {"city", "city.country"})
-    Optional<User> findById(UUID id);
+    Page<User> findAll(Pageable paging);
 
     @EntityGraph(attributePaths = {"city", "city.country"})
-    List<User> findDistinctByLastNameAndFirstName(String lastName, String firstName);
+    Optional<User> findById(UUID id);
 }

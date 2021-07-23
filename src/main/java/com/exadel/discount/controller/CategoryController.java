@@ -1,7 +1,7 @@
 package com.exadel.discount.controller;
 
-import com.exadel.discount.dto.CategoryDTO;
-import com.exadel.discount.dto.validation.Create;
+import com.exadel.discount.model.dto.CategoryDTO;
+import com.exadel.discount.model.dto.validation.Create;
 import com.exadel.discount.security.annotation.AdminAccess;
 import com.exadel.discount.security.annotation.UserAccess;
 import com.exadel.discount.service.CategoryService;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +49,14 @@ public class CategoryController {
     @AdminAccess
     public CategoryDTO addCategory(@RequestBody @Validated(Create.class) CategoryDTO categoryDTO) {
         return categoryService.save(categoryDTO);
+    }
+
+    @PutMapping("/{id}")
+    @AdminAccess
+    @ApiOperation("Update category")
+    public CategoryDTO updateCategory(@PathVariable @NotNull UUID id,
+                                      @RequestBody @Validated(Create.class) CategoryDTO categoryDTO) {
+        return categoryService.updateCategoryById(categoryDTO, id);
     }
 
     @DeleteMapping("/{id}")

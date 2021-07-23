@@ -1,20 +1,17 @@
 package com.exadel.discount.service;
 
-import com.exadel.discount.dto.coupon.CouponDTO;
-import com.exadel.discount.dto.coupon.CouponFilter;
-import com.exadel.discount.dto.coupon.CreateCouponDTO;
+import com.exadel.discount.model.dto.coupon.CouponDTO;
+import com.exadel.discount.model.dto.coupon.CouponFilter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
 
 public interface CouponService {
     CouponDTO findCouponById(UUID id);
 
-    List<CouponDTO> findAllCoupons(int pageNumber, int pageSize, String sortDirection, String sortField, CouponFilter filter);
+    List<CouponDTO> getAll(int pageNumber, int pageSize, String sortDirection, String sortField, CouponFilter filter);
 
-    CouponDTO findCouponByDate(LocalDateTime time);
+    CouponDTO assignCouponToUser(UUID discountId);
 
-    CouponDTO assignCouponToUser(CreateCouponDTO createCouponDTO);
+    List<CouponDTO> search(Integer size, String searchText);
 }

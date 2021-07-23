@@ -1,11 +1,17 @@
 package com.exadel.discount.service.impl;
 
-import com.exadel.discount.dto.discount.CreateDiscountDTO;
-import com.exadel.discount.dto.discount.DiscountDTO;
-import com.exadel.discount.dto.discount.DiscountFilter;
-import com.exadel.discount.entity.*;
-import com.exadel.discount.exception.custom_exception.NotFoundException;
-import com.exadel.discount.mapper.DiscountMapper;
+import com.exadel.discount.exception.NotFoundException;
+import com.exadel.discount.model.dto.discount.CreateDiscountDTO;
+import com.exadel.discount.model.dto.discount.DiscountDTO;
+import com.exadel.discount.model.dto.discount.DiscountFilter;
+import com.exadel.discount.model.dto.discount.UpdateDiscountDTO;
+import com.exadel.discount.model.dto.mapper.DiscountMapper;
+import com.exadel.discount.model.entity.Category;
+import com.exadel.discount.model.entity.Discount;
+import com.exadel.discount.model.entity.QDiscount;
+import com.exadel.discount.model.entity.Tag;
+import com.exadel.discount.model.entity.Vendor;
+import com.exadel.discount.model.entity.VendorLocation;
 import com.exadel.discount.repository.CategoryRepository;
 import com.exadel.discount.repository.DiscountRepository;
 import com.exadel.discount.repository.TagRepository;
@@ -17,10 +23,10 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +34,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
@@ -42,6 +48,7 @@ public class DiscountServiceImpl implements DiscountService {
     private final CategoryRepository categoryRepository;
     private final VendorLocationRepository locationRepository;
     private final DiscountMapper discountMapper;
+    private final int SEARCH_WORD_MIN_LENGTH = 3;
 
     @Override
     public DiscountDTO save(CreateDiscountDTO createDiscountDTO) {
@@ -59,13 +66,20 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
+    @Transactional
     public DiscountDTO getById(UUID id) {
         log.debug(String.format("Finding Discount with ID %s", id));
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         Discount discount = discountRepository
-                .findByIdAndArchived(id, false)
+                .findByIdAndArchivedWithFavoritesByUser(id, false, userEmail)
                 .orElseThrow(() -> new NotFoundException(String.format("Discount with id %s not found", id)));
+        discountRepository.increaseViewNumberById(id);
+        DiscountDTO discountDTO = discountMapper.getDTO(discount);
+        if (!discount.getFavorites().isEmpty()) {
+            discountDTO.setFavorite(true);
+        }
         log.debug(String.format("Successfully found Discount with ID %s", id));
-        return discountMapper.getDTO(discount);
+        return discountDTO;
     }
 
     @Override
@@ -74,11 +88,47 @@ public class DiscountServiceImpl implements DiscountService {
                 Sort.by(sortBy).descending() :
                 Sort.by(sortBy);
         log.debug("Getting list of all Discounts by filter");
-        List<Discount> discounts = discountRepository.findAll(preparePredicateForFindingAll(filter), sort);
-        Page<Discount> discountPage = PageableExecutionUtils
-                .getPage(discounts, PageRequest.of(page, size), () -> discounts.size());
+        List<UUID> discountIds = discountRepository
+                .findAllDiscountIds(preparePredicateForFindingAll(filter), PageRequest.of(page, size, sort));
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<DiscountDTO> discountDTOS = findAllDiscounts(discountIds, sort, userEmail, filter)
+                .stream()
+                .map(discount -> {
+                    DiscountDTO discountDTO = discountMapper.getDTO(discount);
+                    if (!discount.getFavorites().isEmpty()) {
+                        discountDTO.setFavorite(true);
+                    }
+                    return discountDTO;
+                })
+                .collect(Collectors.toList());
         log.debug("Successfully got list of all Discounts by filter");
-        return discountMapper.getListDTO(discountPage.getContent());
+        return discountDTOS;
+    }
+
+    @Override
+    @Transactional
+    public DiscountDTO updateDiscountById(UpdateDiscountDTO updateDiscountDTO, UUID id) {
+        log.debug("Update discount by ID");
+        Discount discount = discountRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Not all tags with IDs %s exist", id)));
+
+        if (updateDiscountDTO.getCategoryId() != null) {
+            findCategory(updateDiscountDTO.getCategoryId());
+        }
+        if (updateDiscountDTO.getVendorId() != null) {
+            findVendor(updateDiscountDTO.getVendorId());
+        }
+        if (updateDiscountDTO.getVendorId() != null && updateDiscountDTO.getVendorLocationsIds() != null) {
+            findVendorLocations(updateDiscountDTO.getVendorId(), updateDiscountDTO.getVendorLocationsIds());
+        }
+        if (updateDiscountDTO.getTagIds() != null) {
+            findTags(updateDiscountDTO.getTagIds());
+        }
+        discount = discountMapper.update(updateDiscountDTO, discount);
+        discount.setId(id);
+        DiscountDTO discountDTO = discountMapper.getDTO(discountRepository.save(discount));
+        log.debug("Successfully updated discount by ID");
+        return discountDTO;
     }
 
     @Override
@@ -110,14 +160,24 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<DiscountDTO> search(Integer size, String searchText) {
+        Sort sort = Sort.by("viewNumber").descending();
         log.debug("Getting list of all Discounts by searchText");
-        List<Discount> discounts = discountRepository
-                .findAll(prepareSearchPredicate(searchText),
-                        PageRequest.of(0, size, Sort.by("viewNumber"))).getContent();
-//        Page<Discount> discountPage = PageableExecutionUtils
-//                .getPage(discounts, PageRequest.of(0, size), () -> discounts.size());
+        List<UUID> discountsIds = discountRepository
+                .findAllDiscountIds(prepareSearchPredicate(searchText), PageRequest.of(0, size, sort));
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<DiscountDTO> discountDTOS = discountRepository
+                .findAllByIdInWithFavoritesByUser(discountsIds, sort, userEmail)
+                .stream()
+                .map(discount -> {
+                    DiscountDTO discountDTO = discountMapper.getDTO(discount);
+                    if (!discount.getFavorites().isEmpty()) {
+                        discountDTO.setFavorite(true);
+                    }
+                    return discountDTO;
+                })
+                .collect(Collectors.toList());
         log.debug("Successfully got list of all Discounts by searchText");
-        return discountMapper.getListDTO(discounts);
+        return discountDTOS;
     }
 
     private Set<Tag> findTags(Set<UUID> tagIds) {
@@ -176,10 +236,9 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     private Predicate prepareSearchPredicate(String searchText) {
-        List<Predicate> searchPredicates = Pattern
-                .compile(" ")
-                .splitAsStream(searchText)
-                .filter(word -> word.length() >= 3)
+        List<Predicate> searchPredicates = Stream
+                .of(StringUtils.split(searchText, StringUtils.SPACE))
+                .filter(word -> word.length() >= SEARCH_WORD_MIN_LENGTH)
                 .map(word -> QueryPredicateBuilder.init()
                         .append(word, QDiscount.discount.name::containsIgnoreCase)
                         .append(word, QDiscount.discount.description::containsIgnoreCase)
@@ -188,6 +247,22 @@ public class DiscountServiceImpl implements DiscountService {
                         .append(word, QDiscount.discount.tags.any().name::containsIgnoreCase)
                         .buildOr())
                 .collect(Collectors.toList());
+        searchPredicates.add(QueryPredicateBuilder.init()
+                .append(false, QDiscount.discount.archived::eq)
+                .buildAnd());
         return ExpressionUtils.allOf(searchPredicates);
+    }
+
+    private List<Discount> findAllDiscounts(List<UUID> discountIds, Sort sort, String userEmail,
+                                            DiscountFilter filter) {
+        if (filter.getCityIds() != null || filter.getCountryIds() != null) {
+            return discountRepository
+                    .findAllByIdInWithFavoritesByUserAndLocations(discountIds, sort, userEmail,
+                            filter.getCityIds(), filter.getCountryIds());
+        } else {
+            return discountRepository
+                    .findAllByIdInWithFavoritesByUser(discountIds, sort, userEmail);
+        }
+
     }
 }
