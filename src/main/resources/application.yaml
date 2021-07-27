@@ -1,37 +1,17 @@
 spring:
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     open-in-view: false
-    properties:
-      hibernate:
-        default-schema: public
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: postgres
-  test:
-    database:
-      replace: none
-  liquibase:
-    change-log: classpath:/db/changelog/db.changelog-master.yaml
-    contexts: test
-
-logging:
-  level:
-    liquibase: INFO
-
-jwt:
-  token:
-    expiration:
-      seconds:
-        access: 120
-        refresh: 3600
-    encryption:
-      key: encryptionSecret
-cors:
-  hosts:
-    - http://localhost:4200
+JWT.EXPIRATION.ACCESS: 120
+JWT.EXPIRATION.REFRESH: 3600
+JWT.ENCRYPTION.ENCRYPTION_KEY: encryptionSecret
+CLOUD.AWS.S3.CREDENTIALS.ACCESS_KEY: AKIAQWULYLKE4RD276W4
+CLOUD.AWS.S3.CREDENTIALS.SECRET_KEY: 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
+CORS.ACCEPTED_ORIGINS: http://localhost:4200

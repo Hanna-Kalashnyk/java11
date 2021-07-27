@@ -1,6 +1,8 @@
 package com.exadel.discount.repository;
 
+import com.exadel.discount.model.dto.statistics.DiscountStatisticsDTO;
 import com.exadel.discount.model.entity.Discount;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,18 +20,18 @@ import java.util.UUID;
 public interface DiscountRepository extends JpaRepository<Discount, UUID>, QueryFactoryDiscountRepository {
 
     @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country"})
+            "vendorLocations.city", "vendorLocations.city.country", "discountImages"})
     List<Discount> findAll();
 
     @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country"})
+            "vendorLocations.city", "vendorLocations.city.country", "discountImages"})
     Optional<Discount> findById(UUID id);
 
-    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor"})
+    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor", "discountImages"})
     List<Discount> findAllByIdIn(Iterable<UUID> ids, Sort sort);
 
     @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country", "favorites"})
+            "vendorLocations.city", "vendorLocations.city.country", "favorites", "discountImages"})
     @Query("SELECT d FROM Discount d " +
             "LEFT JOIN d.favorites f " +
             "ON f.user.email = :userEmail " +
@@ -37,7 +40,7 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID>, Query
                                                     @Param("userEmail") String userEmail);
 
     @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country", "favorites"})
+            "vendorLocations.city", "vendorLocations.city.country", "favorites", "discountImages"})
     @Query("SELECT d FROM Discount d " +
             "LEFT JOIN d.favorites f " +
             "ON f.user.email = :userEmail " +
@@ -46,7 +49,7 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID>, Query
             @Param("discountId") UUID id, @Param("archived") boolean archived, @Param("userEmail") String userEmail);
 
     @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country", "favorites"})
+            "vendorLocations.city", "vendorLocations.city.country", "favorites", "discountImages"})
     @Query("SELECT d FROM Discount d " +
             "LEFT JOIN d.favorites f " +
             "ON f.user.email = :userEmail " +
@@ -64,7 +67,7 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID>, Query
     void increaseViewNumberById(@Param("discountId") UUID id);
 
     @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country"})
+            "vendorLocations.city", "vendorLocations.city.country", "discountImages"})
     Optional<Discount> findByIdAndArchived(UUID id, boolean archived);
 
     @Modifying
@@ -74,4 +77,31 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID>, Query
     boolean existsByIdAndArchived(UUID id, boolean archived);
 
     boolean existsByIdAndArchivedAndVendorArchived(UUID id, boolean discountArchived, boolean vendorArchived);
+
+    @Query("SELECT new com.exadel.discount.model.dto.statistics.DiscountStatisticsDTO " +
+            "(d.id, d.name, d.viewNumber, COUNT(cou) AS numberOfGettingPromo) FROM Discount d " +
+            "LEFT JOIN d.vendor v " +
+            "LEFT JOIN d.category c " +
+            "LEFT JOIN d.coupons cou " +
+            "ON cou.date <= :dateTo AND cou.date >= :dateFrom " +
+            "GROUP BY d ")
+    List<DiscountStatisticsDTO> getDiscountsStatistics(@Param("dateFrom") LocalDateTime dateFrom,
+                                                       @Param("dateTo") LocalDateTime dateTo,
+                                                       Pageable pageable);
+
+    @Query("SELECT new com.exadel.discount.model.dto.statistics.DiscountStatisticsDTO " +
+            "(d.id, d.name, d.viewNumber, COUNT(cou) AS numberOfGettingPromo) FROM Discount d " +
+            "LEFT JOIN d.vendor v " +
+            "LEFT JOIN d.category c " +
+            "LEFT JOIN d.coupons cou " +
+            "ON cou.date <= :dateTo AND cou.date >= :dateFrom " +
+            "LEFT JOIN d.vendorLocations l " +
+            "WHERE l.city.id IN :cityIds " +
+            "OR l.city.country.id IN :countryIds " +
+            "GROUP BY d")
+    List<DiscountStatisticsDTO> getDiscountsStatistics(@Param("dateFrom") LocalDateTime dateFrom,
+                                                       @Param("dateTo") LocalDateTime dateTo,
+                                                       @Param("cityIds") Iterable<UUID> cityIds,
+                                                       @Param("countryIds") Iterable<UUID> countryIds,
+                                                       Pageable pageable);
 }
