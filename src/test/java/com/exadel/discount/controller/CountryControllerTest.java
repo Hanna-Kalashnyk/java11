@@ -10,27 +10,30 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
-@ActiveProfiles("integrationtest")
+@Transactional
+@ActiveProfiles("test")
 public class CountryControllerTest extends AbstractIT {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    public void getAllCountriesTest() throws Exception {
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testGetAllCountriesForAdmin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/countries"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
     }
 
     @Test
-    public void getCountryByIdTest() throws Exception {
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testGetCountryById() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/countries/b49abef5-83fe-4d0c-9927-c0aaaf49a2b7"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -38,7 +41,8 @@ public class CountryControllerTest extends AbstractIT {
     }
 
     @Test
-    public void saveCountryTest() throws Exception {
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testSaveCountry() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/countries")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -47,16 +51,18 @@ public class CountryControllerTest extends AbstractIT {
                 .andExpect(jsonPath("$.name").value("Test"));
     }
 
-   /* @Test
-    public void deleteCountryByIdTest() throws Exception {
+    @Test
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testDeleteCountryById() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/countries/ec62f606-7de5-443a-8d37-cee82134c6cf")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
-    }*/
+    }
 
     @Test
-    public void getAllCitiesByCountryIdTest() throws Exception {
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testGetAllCitiesByCountryId() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/countries/b49abef5-83fe-4d0c-9927-c0aaaf49a2b7/cities")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -64,7 +70,8 @@ public class CountryControllerTest extends AbstractIT {
     }
 
     @Test
-    public void saveCityTest() throws Exception {
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testSaveCity() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/countries/b49abef5-83fe-4d0c-9927-c0aaaf49a2b7/cities")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"name\": \"Test\"" + "}"))
@@ -73,18 +80,20 @@ public class CountryControllerTest extends AbstractIT {
     }
 
     @Test
-    public void getCityByIdTest() throws Exception {
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testGetCityById() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/countries/b49abef5-83fe-4d0c-9927-c0aaaf49a2b7/cities/489cd7f8-870c-4dd1-abc8-e31145a15c5c"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
     }
 
-   /* @Test
-    public void deleteCityTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/countries/13e43451-6b1b-4e0f-bc61-8d903d226617/cities/794a4106-ff4d-44bb-960a-3dec50b033ab")
+    @Test
+    @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
+    public void testDeleteCity() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/countries/b49abef5-83fe-4d0c-9927-c0aaaf49a2b7/cities/658b74f2-4fb5-4b9d-a87f-0b8f44f06f09")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
-    }*/
+    }
 }

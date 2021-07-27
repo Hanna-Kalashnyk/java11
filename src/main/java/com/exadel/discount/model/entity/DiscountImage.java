@@ -39,7 +39,7 @@ public class DiscountImage {
     @Column(name = "by_default", nullable = false)
     private boolean byDefault;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "discount_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "discount_id")
     private Discount discount;
 }

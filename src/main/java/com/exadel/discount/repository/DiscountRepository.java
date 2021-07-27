@@ -19,19 +19,16 @@ import java.util.UUID;
 @Repository
 public interface DiscountRepository extends JpaRepository<Discount, UUID>, QueryFactoryDiscountRepository {
 
-    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country", "discountImages"})
+    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor", "discountImages",
+            "vendorLocations.city", "vendorLocations.city.country"})
     List<Discount> findAll();
 
-    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country", "discountImages"})
+    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor", "discountImages",
+            "vendorLocations.city", "vendorLocations.city.country"})
     Optional<Discount> findById(UUID id);
 
-    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor", "discountImages"})
-    List<Discount> findAllByIdIn(Iterable<UUID> ids, Sort sort);
-
-    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country", "favorites", "discountImages"})
+    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor", "discountImages",
+            "vendorLocations.city", "vendorLocations.city.country", "favorites"})
     @Query("SELECT d FROM Discount d " +
             "LEFT JOIN d.favorites f " +
             "ON f.user.email = :userEmail " +
@@ -39,8 +36,8 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID>, Query
     List<Discount> findAllByIdInWithFavoritesByUser(@Param("discountIds") Iterable<UUID> ids, Sort sort,
                                                     @Param("userEmail") String userEmail);
 
-    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country", "favorites", "discountImages"})
+    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor", "discountImages",
+            "vendorLocations.city", "vendorLocations.city.country", "favorites"})
     @Query("SELECT d FROM Discount d " +
             "LEFT JOIN d.favorites f " +
             "ON f.user.email = :userEmail " +
@@ -48,8 +45,8 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID>, Query
     Optional<Discount> findByIdAndArchivedWithFavoritesByUser(
             @Param("discountId") UUID id, @Param("archived") boolean archived, @Param("userEmail") String userEmail);
 
-    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country", "favorites", "discountImages"})
+    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor", "discountImages",
+            "vendorLocations.city", "vendorLocations.city.country", "favorites"})
     @Query("SELECT d FROM Discount d " +
             "LEFT JOIN d.favorites f " +
             "ON f.user.email = :userEmail " +
@@ -66,8 +63,8 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID>, Query
             "WHERE d.id = :discountId")
     void increaseViewNumberById(@Param("discountId") UUID id);
 
-    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor",
-            "vendorLocations.city", "vendorLocations.city.country", "discountImages"})
+    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor", "discountImages",
+            "vendorLocations.city", "vendorLocations.city.country"})
     Optional<Discount> findByIdAndArchived(UUID id, boolean archived);
 
     @Modifying
@@ -104,4 +101,11 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID>, Query
                                                        @Param("cityIds") Iterable<UUID> cityIds,
                                                        @Param("countryIds") Iterable<UUID> countryIds,
                                                        Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category", "vendorLocations", "tags", "vendor", "discountImages",
+            "vendorLocations.city", "vendorLocations.city.country", "favorites"})
+    @Query("SELECT d FROM Discount d " +
+            "LEFT JOIN d.favorites f " +
+            "WHERE f.user.id = :userId AND d.archived = false")
+    List<Discount> findFavoriteDiscountsByUserId(@Param("userId") UUID userId, Pageable pageable);
 }

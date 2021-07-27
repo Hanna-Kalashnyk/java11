@@ -6,12 +6,19 @@ spring:
     open-in-view: false
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
-JWT.EXPIRATION.ACCESS: 120
-JWT.EXPIRATION.REFRESH: 3600
-JWT.ENCRYPTION.ENCRYPTION_KEY: encryptionSecret
-CLOUD.AWS.S3.CREDENTIALS.ACCESS_KEY: AKIAQWULYLKE4RD276W4
-CLOUD.AWS.S3.CREDENTIALS.SECRET_KEY: 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
-CORS.ACCEPTED_ORIGINS: http://localhost:4200
+  mail:
+    default-encoding: UTF-8
+    protocol: smtp
+    port: 587
+    host: smtp.gmail.com
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    tls: true
+    properties.mail.smtp:
+      auth: true
+      starttls.enable: true
+      ssl.trust: smtp.gmail.com
+jwt:
+  expiration:
+    access: 120
+    refresh: 3600
