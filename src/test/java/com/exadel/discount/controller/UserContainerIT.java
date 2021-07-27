@@ -33,18 +33,19 @@ public class UserContainerIT extends AbstractIT {
                 .accept(ContentType.JSON)
                 .param("cityIds", "93577f24-f68f-403e-aa04-0a60c3a445d8")
                 .param("countryIds", "93577f24-f68f-403e-aa04-0a60c3a445d7")
-                .param("firstName", "Ivan")
-                .param("lastName", "Ivanov")
+                .param("firstName", "Andrey")
+                .param("lastName", "Andreyev")
                 .when()
-                .get("/useres")
+                .get("/users")
                 .then()
                 .assertThat(MockMvcResultMatchers.status().isOk())
                 .assertThat(MockMvcResultMatchers.status().is2xxSuccessful())
                 .assertThat(jsonPath("$[0].firstName").value("Andrey"))
-                .assertThat(jsonPath("$[0].last_name").value("Andreyev"))
+                .assertThat(jsonPath("$[0].lastName").value("Andreyev"))
                 .assertThat(jsonPath("$[0].email").value("Andreyev@gmail.com"))
                 .assertThat(jsonPath("$[0].phone").value("+380501113337"))
                 .assertThat(jsonPath("$[0].role").value("USER"))
+                .assertThat(jsonPath("$[0].city.countryName").value("Ukraine"))
                 .assertThat(jsonPath("$[0].city.name").value("Kyiv"));
     }
 
@@ -61,10 +62,27 @@ public class UserContainerIT extends AbstractIT {
                 .assertThat(MockMvcResultMatchers.status().isOk())
                 .assertThat(MockMvcResultMatchers.status().is2xxSuccessful())
                 .assertThat(jsonPath("$.firstName").value("Andrey"))
-                .assertThat(jsonPath("$.last_name").value("Andreyev"))
+                .assertThat(jsonPath("$.lastName").value("Andreyev"))
                 .assertThat(jsonPath("$.email").value("Andreyev@gmail.com"))
                 .assertThat(jsonPath("$.phone").value("+380501113337"))
                 .assertThat(jsonPath("$.role").value("USER"))
                 .assertThat(jsonPath("$.city.name").value("Kyiv"));
+    }
+
+    @Test
+    public void getNotExistUserIT() throws Exception {
+        given()
+                .webAppContextSetup(wac)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .param("cityIds", "93577f24-f68f-403e-aa04-0a60c3a445d8")
+                .param("countryIds", "93577f24-f68f-403e-aa04-0a60c3a445d7")
+                .param("firstName", "Ivan")
+                .param("lastName", "Ivanov")
+                .when()
+                .get("/users/91cf19dd-2af7-49ee-825e-94c0831ba1")
+                .then()
+                .assertThat(MockMvcResultMatchers.status().isNotFound())
+                .assertThat(MockMvcResultMatchers.status().is4xxClientError());
     }
 }
