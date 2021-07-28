@@ -17,7 +17,6 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ActiveProfiles("test")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Sql("classpath:testdata/favorite_add_test_data.sql")
 @WithMockUser(username = "admin@mail.com", roles = {"USER", "ADMIN"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,30 +24,6 @@ public class CouponIT extends AbstractIT {
 
     @Autowired
     WebApplicationContext wac;
-
-    @WithUserDetails("admin@mail.com")
-    @Test
-    public void postNewCouponIT() throws Exception {
-
-        given().webAppContextSetup(wac)
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .param("discountId", "93577f24-f68f-403e-aa04-0a60c3a445d1")
-                .when()
-                .post("/coupons")
-                .then()
-                .assertThat(MockMvcResultMatchers.status().isOk())
-                .assertThat(MockMvcResultMatchers.status().is2xxSuccessful())
-                .assertThat(jsonPath("$.discount.name").value("Toy for your dog"))
-                .assertThat(jsonPath("$.discount.description").value("Dog stuff"))
-                .assertThat(jsonPath("$.discount.value").value("5"))
-                .assertThat(jsonPath("$.discount.discountType").value("PERCENT"))
-                .assertThat(jsonPath("$.discount.promo").value("1abcde1"))
-                .assertThat(jsonPath("$.discount.endTime").value("2021-07-20T00:00:00"))
-                .assertThat(jsonPath("$.discount.archived").value("false"))
-                .assertThat(jsonPath("$.discount.vendor.name").value("Dog stuff"))
-                .assertThat(jsonPath("$.discount.category.name").value("Dogs"));
-    }
 
     @Test
     public void getAllUsersCouponsIT() throws Exception {
