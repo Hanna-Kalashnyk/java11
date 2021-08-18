@@ -51,11 +51,6 @@ public class UserServiceTest extends AbstractIT {
         expected.setId(ID);
     }
 
-    @AfterEach
-    public void tearDown() {
-        expected = null;
-    }
-
     @Test
     public void testFindUserById() {
         when(userRepository.findById(ID)).thenReturn(Optional.of(expected));

@@ -24,5 +24,5 @@ spring:
       ssl.trust: smtp.gmail.com
 jwt:
   expiration:
-    access: 120
+    access: 120000
     refresh: 3600

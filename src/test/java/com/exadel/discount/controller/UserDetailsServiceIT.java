@@ -1,6 +1,5 @@
-package com.exadel.discount.service;
+package com.exadel.discount.controller;
 
-import com.exadel.discount.controller.AbstractIT;
 import com.exadel.discount.security.entity.UserDetailsImpl;
 import com.exadel.discount.service.impl.UserDetailsServiceImpl;
 import org.junit.jupiter.api.Assertions;
